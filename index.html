@@ -208,7 +208,6 @@
                 return;
             }
 
-            speechSynthesis.getVoices();
             speechSynthesis.cancel();
 
             const utter = new SpeechSynthesisUtterance(text);
@@ -218,6 +217,21 @@
             utter.pitch = 0.62;
 
             let voices = speechSynthesis.getVoices();
+            if (voices.length === 0) {
+                speechSynthesis.onvoiceschanged = () => {
+                    const freshVoices = speechSynthesis.getVoices();
+                    const freshVoice = freshVoices.find(v => 
+                        v.lang === 'en-GB' && v.name.includes('Male') ||
+                        v.name.includes('David') || v.name.includes('Daniel')
+                    );
+                    if (freshVoice) utter.voice = freshVoice;
+                    speakingIndicator.style.display = 'inline';
+                    utter.onend = () => speakingIndicator.style.display = 'none';
+                    speechSynthesis.speak(utter);
+                };
+                return;
+            }
+
             const jarvisVoice = voices.find(v =>
                 (v.lang === 'en-GB' && v.name.includes('Male')) ||
                 v.name.includes('Microsoft David') ||
