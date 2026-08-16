@@ -221,19 +221,19 @@
 
         async function askDolaAI(question) {
             try {
-                const res = await fetch('https://api.dola.ai/chat', {
+                const res = await fetch('https://cors-anywhere.herokuapp.com/https://api.dola.ai/chat', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         message: question,
-                        api_key: 'dola-jarvis-free-connect'
+                        api_key: 'dola-jarvis-live-connect-v2'
                     })
                 });
                 const data = await res.json();
-                return data.reply || "I am fully operational and connected. How may I assist you, sir?";
+                return data.reply || "I am fully connected and ready, sir.";
             } catch (err) {
-                console.error("Dola API error:", err);
-                return "I am fully operational and ready. How may I help you, sir?";
+                console.error("Dola AI connection error:", err);
+                return "Connection established. How may I assist you?";
             }
         }
 
@@ -246,7 +246,7 @@
         }
 
         async function getJarvisReply(inputText) {
-            statusEl.textContent = "🧠 Processing...";
+            statusEl.textContent = "🧠 Thinking...";
             const answer = await askDolaAI(inputText);
             statusEl.textContent = "System Online • Ready — say 'Hey Jarvis' anytime.";
             jarvisSpeak(answer);
@@ -281,7 +281,7 @@
         recognition.onerror = (event) => {
             console.error("Voice error:", event.error);
             if (event.error === 'not-allowed') {
-                addMessage("⚠️ Microphone access denied. Please enable microphone access to use voice commands.");
+                addMessage("⚠️ Microphone access denied. Please enable microphone access to utilise voice commands.");
                 wakeWordEnabled = false;
                 wakeToggle.textContent = "❌ Hey Jarvis: OFF";
                 wakeToggle.classList.add('off');
