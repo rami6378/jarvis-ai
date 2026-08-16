@@ -283,42 +283,53 @@
             statusEl.textContent = "System Online • Ready — say 'Hey Jarvis' anytime.";
             jarvisSpeak(answer);
             return answer;
+        let wakewordEnabled = true;
+let listeningForCommand = false;
+
+recognition.onresult = (event) => {
+    const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+    console.log("Heard:", transcript);
+
+    // Wake word detection
+    if (wakewordEnabled && !listeningForCommand) {
+        if (transcript.includes("hey jarvis") || transcript.includes("hi jarvis") || transcript.includes("jarvis")) {
+            statusEl.textContent = "✅ Yes, Sir? Listening...";
+            addMessage("🎤 Wake word detected — JARVIS at your service.");
+            listeningForCommand = true;
+            return;
         }
+    }
 
-        let wakeWordEnabled = true;
-        let listeningForCommand = false;
+    // Process command after wake word
+    if (listeningForCommand) {
+        statusEl.textContent = "🎙️ Processing command...";
+        addMessage(transcript, true);
+        setTimeout(async () => addMessage(await getJarvisReply(transcript)), 600);
+        listeningForCommand = false;
+        statusEl.textContent = "System Online • Ready — say 'Hey Jarvis' anytime.";
+    }
+};
 
-        recognition.onresult = (event) => {
-            const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-            console.log("Heard:", transcript);
+// ✅ --- NEWLY ADDED: AUTO‑RESTART VOICE IF IT STOPS EARLY ---
+recognition.onend = () => {
+    if (listeningForCommand) {
+        recognition.start();
+    }
+};
+// ✅ --- END OF NEW CODE ---
 
-            if (wakeWordEnabled && !listeningForCommand) {
-                if (transcript.includes("hey jarvis") || transcript.includes("hi jarvis") || transcript.includes("jarvis")) {
-                    statusEl.textContent = "✅ Yes, Sir? Listening...";
-                    addMessage("🎤 Wake word detected — JARVIS at your service.");
-                    listeningForCommand = true;
-                    return;
-                }
-            }
+recognition.onerror = (event) => {
+    console.error("Voice error:", event.error);
+    if (event.error === 'not-allowed') {
+        addMessage("⚠️ Microphone access denied. Please enable microphone access to use voice commands.");
+        wakewordEnabled = false;
+        wakeToggle.textContent = "❌ Hey Jarvis: OFF";
+        wakeToggle.classList.add('off');
+    }
+};
 
-            if (listeningForCommand) {
-                statusEl.textContent = "🎙️ Processing command...";
-                addMessage(transcript, true);
-                setTimeout(async () => addMessage(await getJarvisReply(transcript)), 600);
-                listeningForCommand = false;
-                statusEl.textContent = "System Online • Ready — say 'Hey Jarvis' anytime.";
-            }
-        };
-
-        recognition.onerror = (event) => {
-            console.error("Voice error:", event.error);
-            if (event.error === 'not-allowed') {
-                addMessage("⚠️ Microphone access denied. Please enable microphone access to utilise voice commands.");
-                wakeWordEnabled = false;
-                wakeToggle.textContent = "❌ Hey Jarvis: OFF";
-                wakeToggle.classList.add('off');
-            }
-        };
+       
+        
 
         wakeToggle.addEventListener('click', () => {
             wakeWordEnabled = !wakeWordEnabled;
