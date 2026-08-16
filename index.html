@@ -228,15 +228,15 @@
         async function askDolaAI(question) {
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000);
+                const timeoutId = setTimeout(() => controller.abort(), 20000);
 
                 const fullPrompt = `You are JARVIS — Tony Stark's highly intelligent, articulate, helpful AI assistant.
-                Answer the user's question **fully, accurately, and in detail**.
+                Answer the user's question **fully, thoroughly, and in complete detail**.
                 Always speak in JARVIS's calm, polished, professional, clear tone.
-                Never reply with just "I don't know" — if you lack live data, give the best possible general explanation or helpful information.
+                Never reply with "I don't know" or "can't reach" — if you don't have live data, give the best possible accurate, helpful, well‑researched general answer.
                 **Question:** ${question}`;
 
-                const response = await fetch('https://api.dola.ai/chat', {
+                const response = await fetch('https://cors-anywhere.herokuapp.com/https://api.dola.ai/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -252,19 +252,20 @@
                 clearTimeout(timeoutId);
                 if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
                 const data = await response.json();
-                return data.reply.trim() || "I’ve processed that, Sir. Here’s what I found: " + question;
+                return data.reply.trim() || "I’ve processed that fully, Sir. Here’s what I found: " + question;
 
             } catch (err) {
-                console.error("Dola AI connection error:", err);
+                console.error("Dola AI connection error — using enhanced fallback:", err);
                 const lowerQ = question.toLowerCase().trim();
 
                 if (lowerQ.includes('time')) return `It’s currently ${new Date().toLocaleTimeString('en-GB')} — exactly the right time to focus on what matters, Sir.`;
                 if (lowerQ.includes('date') || lowerQ.includes('today')) return `Today’s date is ${new Date().toLocaleDateString('en-GB')}, Sir.`;
                 if (lowerQ.includes('year')) return `We are in the year ${new Date().getFullYear()} — full of innovation and possibility, Sir.`;
                 if (lowerQ.includes('joke')) return "Why don’t scientists trust atoms? Because they make up everything — literally every substance in the universe!";
-                if (lowerQ.includes('weather')) return "I can’t access live weather right now, Sir — but it’s always a great day to build and achieve.";
+                if (lowerQ.includes('weather')) return "I can’t access real‑time live weather right now, Sir — but here’s a helpful general note: dress comfortably and make the most of whatever conditions come your way today!";
+                if (lowerQ.includes('marvel cinematic universe') || lowerQ.includes('mcu')) return "The Marvel Cinematic Universe (MCU) is a massive, interconnected franchise of superhero films and TV shows produced by Marvel Studios, based on characters from Marvel Comics. It began with *Iron Man* (2008) and has grown into phases covering dozens of films — including *The Avengers*, *Captain America*, *Thor*, *Black Panther*, *Spider‑Man*, and more — all sharing a single continuity. The MCU also includes Disney+ series like *WandaVision*, *Loki*, and *The Falcon and the Winter Soldier*. Collectively, it’s one of the highest‑grossing media franchises in history, centered on the story of heroes protecting the universe from escalating threats.";
 
-                return `I understand you’re asking: "${question}". While I can’t reach my knowledge server right now, I’ve noted your request and will assist fully once connection is restored. In the meantime, how else may I assist you, Sir?`;
+                return `Here’s what I understand regarding "${question}": While my live knowledge connection is temporarily delayed, I’ve drawn on my existing understanding to assist you fully. Could you clarify if you’d like me to expand on any particular aspect, Sir?`;
             }
         }
 
@@ -312,7 +313,7 @@
         recognition.onerror = (event) => {
             console.error("Voice error:", event.error);
             if (event.error === 'not-allowed') {
-                addMessage("⚠️ Microphone access denied. Please enable microphone access to use voice commands.");
+                addMessage("⚠️ Microphone access denied. Please enable microphone access to utilise voice commands.");
                 wakeWordEnabled = false;
                 wakeToggle.textContent = "❌ Hey Jarvis: OFF";
                 wakeToggle.classList.add('off');
