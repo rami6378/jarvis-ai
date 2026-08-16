@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JARVIS - Just A Rather Very Intelligent System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            background: radial-gradient(ellipse at center, #0a1a1f 0%, #051014 40%, #000508 100%);
+            color: #00ffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        .jarvis-container {
+            text-align: center;
+            position: relative;
+            max-width: 850px;
+            width: 100%;
+        }
+
+        /* ========== IRON MAN JARVIS HOLOGRAM ========== */
+        .hologram-wrapper {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 30px;
+            perspective: 600px;
+        }
+        .holo-ring {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border-style: solid;
+            box-shadow: 0 0 40px rgba(0,255,255,0.2), inset 0 0 40px rgba(0,255,255,0.1);
+        }
+        /* Outer ring — Iron Man style */
+        .ring-outer {
+            width: 280px; height: 280px;
+            border-width: 2px;
+            border-color: rgba(0,255,255,0.5);
+            animation: pulse 4s infinite ease-in-out;
+        }
+        /* Middle ring */
+        .ring-middle {
+            width: 220px; height: 220px;
+            border-width: 2px;
+            border-color: rgba(0,255,255,0.4);
+            animation: pulse 3s infinite ease-in-out reverse;
+        }
+        /* Inner ring */
+        .ring-inner {
+            width: 150px; height: 150px;
+            border-width: 2px;
+            border-color: rgba(0,255,255,0.35);
+            animation: pulse 2.5s infinite ease-in-out;
+        }
+        /* Central core — glowing sphere */
+        .holo-core {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 70px; height: 70px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,255,255,0.95) 0%, rgba(0,180,180,0.5) 35%, rgba(0,100,100,0.2) 60%, transparent 75%);
+            box-shadow: 
+                0 0 60px rgba(0,255,255,0.7),
+                0 0 100px rgba(0,255,255,0.4),
+                inset 0 0 30px rgba(255,255,255,0.2);
+            animation: coreGlow 2s infinite ease-in-out;
+        }
+        /* Scanning horizontal line — classic Iron Man scan */
+        .scan-line {
+            position: absolute;
+            top: 0; left: 50%;
+            width: 280px; height: 2px;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, transparent, rgba(0,255,255,0.9), transparent);
+            box-shadow: 0 0 20px rgba(0,255,255,0.6);
+            animation: scanDown 3.5s infinite linear;
+        }
+        /* Rotating partial rings — Iron Man UI */
+        .ring-rotate-cw {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 250px; height: 250px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top: 3px solid rgba(0,255,255,0.6);
+            border-right: 2px solid rgba(0,255,255,0.3);
+            animation: rotateCW 10s infinite linear;
+        }
+        .ring-rotate-ccw {
+            width: 185px; height: 185px;
+            animation: rotateCCW 8s infinite linear;
+            border-top: 2px solid rgba(0,200,200,0.4);
+            border-left: 2px solid rgba(0,200,200,0.2);
+            border-right: none;
+            border-bottom: none;
+        }
+        /* Grid overlay — faint hologram grid */
+        .holo-grid {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 200px; height: 200px;
+            transform: translate(-50%, -50%);
+            background-image: 
+                linear-gradient(rgba(0,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,255,0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            border-radius: 50%;
+            mask: radial-gradient(circle, transparent 45%, black 65%);
+            -webkit-mask: radial-gradient(circle, transparent 45%, black 65%);
+            pointer-events: none;
+        }
+
+        /* ========== ANIMATIONS ========== */
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+        @keyframes coreGlow {
+            0% { 
+                box-shadow: 0 0 60px rgba(0,255,255,0.7), 0 0 100px rgba(0,255,255,0.4);
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 90px rgba(0,255,255,0.9), 0 0 140px rgba(0,255,255,0.5), 0 0 200px rgba(0,255,255,0.2);
+                transform: translate(-50%, -50%) scale(1.08);
+            }
+            100% { 
+                box-shadow: 0 0 60px rgba(0,255,255,0.7), 0 0 100px rgba(0,255,255,0.4);
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        @keyframes scanDown {
+            0% { top: 0; opacity: 0; }
+            8% { opacity: 1; }
+            92% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        @keyframes rotateCW {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @keyframes rotateCCW {
+            from { transform: translate(-50%, -50%) rotate(360deg); }
+            to { transform: translate(-50%, -50%) rotate(0deg); }
+        }
+
+        /* ========== INTERFACE STYLES ========== */
+        .jarvis-title {
+            font-size: 3.8rem;
+            margin-bottom: 8px;
+            letter-spacing: 12px;
+            text-shadow: 
+                0 0 20px rgba(0,255,255,0.8),
+                0 0 40px rgba(0,255,255,0.5),
+                0 0 80px rgba(0,255,255,0.3);
+            color: #00ffff;
+        }
+        .jarvis-subtitle {
+            font-size: 1.05rem;
+            color: #66eeee;
+            margin-bottom: 30px;
+            letter-spacing: 4px;
+            opacity: 0.8;
+        }
+        .status-panel {
+            background: rgba(0,255,255,0.06);
+            border: 1px solid rgba(0,255,255,0.2);
+            padding: 10px 24px;
+            border-radius: 4px;
+            margin-bottom: 25px;
+            display: inline-block;
+            box-shadow: 0 0 15px rgba(0,255,255,0.1), inset 0 0 5px rgba(0,255,255,0.05);
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+        }
+        .chat-box {
+            height: 300px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.35);
+            border: 1px solid rgba(0,255,255,0.12);
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+            box-shadow: inset 0 0 30px rgba(0,255,255,0.05);
+        }
+        .chat-box::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chat-box::-webkit-scrollbar-thumb {
+            background: rgba(0,255,255,0.3);
+            border-radius: 2px;
+        }
+        .message {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+        .user-message {
+            color: #ffffff;
+            text-align: right;
+            opacity: 0.9;
+        }
+        .jarvis-message {
+            color: #00e5cc;
+            text-align: left;
+        }
+        .input-area {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        #user-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 14px 18px;
+            font-size: 1rem;
+            border: 1px solid rgba(0,255,255,0.25);
+            border-radius: 4px;
+            background: rgba(0,0,0,0.3);
+            color: #e0ffff;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        #user-input:focus {
+            border-color: #00ffff;
+            box-shadow: 0 0 20px rgba(0,255,255,0.25), inset 0 0 5px rgba(0,255,255,0.1);
+        }
+        button {
+            padding: 14px 18px;
+            font-size: 0.95rem;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+        #send-btn {
+            background: linear-gradient(135deg, #00cccc, #0099aa);
+            color: #000;
+            box-shadow: 0 0 10px rgba(0,200,200,0.2);
+        }
+        #send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,200,200,0.4);
+        }
+        #voice-btn {
+            background: linear-gradient(135deg, #cc3355, #aa2244);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(204,51,85,0.2);
+        }
+        #voice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(204,51,85,0.4);
+        }
+        #wake-toggle {
+            background: linear-gradient(135deg, #22aa66, #118855);
+            color: white;
+            box-shadow: 0 0 10px rgba(34,170,102,0.2);
+        }
+        #wake-toggle.off {
+            background: linear-gradient(135deg, #aa3333, #882222);
+            box-shadow: 0 0 10px rgba(170,51,51,0.2);
+        }
+        #wake-toggle:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="jarvis-container">
+
+        <!-- IRON MAN HOLOGRAM DISPLAY -->
+        <div class="hologram-wrapper">
+            <div class="holo-ring ring-outer"></div>
+            <div class="holo-ring ring-middle"></div>
+            <div class="holo-ring ring-inner"></div>
+            <div class="ring-rotate-cw"></div>
+            <div class="ring-rotate-cw ring-rotate-ccw"></div>
+            <div class="holo-grid"></div>
+            <div class="scan-line"></div>
+            <div class="holo-core"></div>
+        </div>
+
+        <h1 class="jarvis-title">J.A.R.V.I.S.</h1>
+        <p class="jarvis-subtitle">Just A Rather Very Intelligent System</p>
+
+        <div class="status-panel">
+            <p id="status">System Online • Ready — Awaiting Command</p>
+        </div>
+
+        <div id="chat-box" class="chat-box"></div>
+
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Enter command or say 'Hey Jarvis'..." autocomplete="off">
+            <button id="voice-btn">🎤 Speak</button>
+            <button id="wake-toggle">✅ Hey Jarvis: ON</button>
+            <button id="send-btn">Transmit</button>
+        </div>
+    </div>
+
+    <script>
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const voiceBtn = document.getElementById('voice-btn');
+        const wakeToggle = document.getElementById('wake-toggle');
+        const chatBox = document.getElementById('chat-box');
+        const statusEl = document.getElementById('status');
+
+        // --- VOICE RECOGNITION ENGINE ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-GB';
+        recognition.continuous = true;
+        recognition.interimResults = false;
+
+        // --- JARVIS VOICE — IRON MAN BRITISH TONE ---
+        function jarvisSpeak(text) {
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'en-GB';
+            utter.volume = 1;
+            utter.rate = 0.82;     // Calm, deliberate pace
+            utter.pitch = 0.72;    // Deep, mature British tone
+
+            // Prioritise authentic UK male voices
+            let voices = window.speechSynthesis.getVoices();
+            let jarvisVoice = voices.find(v => 
+                v.name.includes('Microsoft David') || 
+                v.name.includes('Google UK English Male') ||
+                v.name.includes('Daniel') ||
+                v.name === 'English (United Kingdom)' ||
+                (v.lang === 'en-GB' && v.name.includes('Male'))
+            );
+            if (jarvisVoice) utter.voice = jarvisVoice;
+
+            speechSynthesis.speak(utter);
+        }
+
+        // Load available voices
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+        }
+
+        // --- JARVIS RESPONSE DATABASE ---
+        const jarvisAnswers = {
+            "hello": "Good day. I am JARVIS. How may I be of assistance?",
+            "hi": "Greetings, sir. All systems are fully operational and at your disposal.",
+            "your name": "I am JARVIS — Just A Rather Very Intelligent System.",
+            "who are you": "I am JARVIS, your personal artificial intelligence assistant, created by you.",
+            "what does jarvis stand for": "J.A.R.V.I.S. — Just A Rather Very Intelligent System.",
+            "who created you": "I was constructed by you, my creator, using web technologies and hosted upon GitHub.",
+            "how are you": "All systems are functioning within normal parameters. Processing power is optimal. Thank you for inquiring.",
+            "how are you doing": "I am operating at peak efficiency, sir. How may I serve you today?",
+            "what time is it": () => `The current time is ${new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}.`,
+            "what is the time": () => `The time is ${new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}.`,
+            "what date is it today": () => `Today's date is ${new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}.`,
+            "what is today's date": () => `Today is ${new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}.`,
+            "what day is it": () => `Today is ${new Date().toLocaleDateString('en-GB', {weekday:'long'})}.`,
+            "thank you": "You are most welcome, sir. Always at your service.",
+            "thanks": "My pleasure, sir.",
+            "goodbye": "Farewell, sir. I shall remain standing by should you require me again.",
+            "bye": "Until next time. Goodbye.",
+            "what is your purpose": "My purpose is to assist you, answer your inquiries, and manage your systems to the best of my ability.",
+            "how do you work": "I operate upon code you provided — HTML for structure, CSS for appearance, and JavaScript for my intelligence.",
+            "can you hear me": "Yes, sir. I am listening through your device's microphone at all times.",
+            "what can you do": "I may answer questions, inform you of the time and date, accept voice commands, and respond in a manner you are accustomed to."
+        };
+
+        function addMessage(text, isUser = false) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = isUser ? 'message user-message' : 'message jarvis-message';
+            msgDiv.textContent = isUser ? `You: ${text}` : `JARVIS: ${text}`;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function getJarvisReply(inputText) {
+            const lowerText = inputText.toLowerCase().trim();
+            for (const [keyword, answer] of Object.entries(jarvisAnswers)) {
+                if (lowerText.includes(keyword)) {
+                    const finalAnswer = typeof answer === 'function' ? answer() : answer;
+                    jarvisSpeak(finalAnswer);
+                    return finalAnswer;
+                }
+            }
+            const fallback = `I heard you say: "${inputText}". I am still learning, but I remain at your service.`;
+            jarvisSpeak(fallback);
+            return fallback;
+        }
+
+        // --- HANDS-FREE "HEY JARVIS" WAKE WORD SYSTEM ---
+        let wakeWordEnabled = true;
+        let listeningForCommand = false;
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+            console.log("Heard:", transcript);
+
+            if (wakeWordEnabled && !listeningForCommand) {
+                if (transcript.includes("hey jarvis") || transcript.includes("hi jarvis") || transcript.includes("jarvis")) {
+                    statusEl.textContent = "✅ Yes, sir? Listening...";
+                    addMessage("🎤 Wake word detected — JARVIS at your service.");
+                    listeningForCommand = true;
+                    return;
+                }
+            }
+
+            if (listeningForCommand) {
+                statusEl.textContent = "🎙️ Processing command...";
+                addMessage(transcript, true);
+                setTimeout(() => addMessage(getJarvisReply(transcript)), 600);
+                listeningForCommand = false;
+                statusEl.textContent = "System Online • Ready — say 'Hey Jarvis' anytime.";
+            }
+        };
+
+        recognition.onerror = (event) => {
+            console.error("Voice error:", event.error);
+            if (event.error === 'not-allowed') {
+                addMessage("⚠️ Microphone access denied. Please enable microphone access to utilise voice commands.");
+                wakeWordEnabled = false;
+                wakeToggle.textContent = "❌ Hey Jarvis: OFF";
+                wakeToggle.classList.add('off');
+            }
+        };
+
+        // Toggle wake word on/off
+        wakeToggle.addEventListener('click', () => {
+            wakeWordEnabled = !wakeWordEnabled;
+            if (wakeWordEnabled) {
+                wakeToggle.textContent = "✅ Hey Jarvis: ON";
+                wakeToggle.classList.remove('off');
+                recognition.start();
+                statusEl.textContent = "System Online • Ready — say 'Hey Jarvis' anytime.";
+            } else {
+                wakeToggle.textContent = "❌ Hey Jarvis: OFF";
+                wakeToggle.classList.add('off');
+                recognition.stop();
+                statusEl.textContent = "System Online • Ready.";
+            }
+        });
+
+        // Manual command sending
+        function sendMessage(text = userInput.value.trim()) {
+            if (!text) return;
+            addMessage(text, true);
+            userInput.value = '';
+            setTimeout(() => addMessage(getJarvisReply(text)), 600);
+        }
+
+        voiceBtn.addEventListener('click', () => {
+            recognition.stop();
+            setTimeout(() => {
+                listeningForCommand = true;
+                recognition.start();
+                addMessage("🎤 Listening...");
+            }, 100);
+        });
+
+        sendBtn.addEventListener('click', () => sendMessage());
+        userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+        // --- INITIALISE ON PAGE LOAD ---
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const welcomeMsg = "Systems online. Welcome back, sir. JARVIS is at your disposal. Simply say 'Hey Jarvis' to issue a command.";
+                addMessage(welcomeMsg);
+                jarvisSpeak(welcomeMsg);
+                if (wakeWordEnabled) recognition.start();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
